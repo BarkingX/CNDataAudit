@@ -1,12 +1,12 @@
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-from CNDataAudit.spiders.datagov_spider import DataGovSpider
+from CNDataAudit.spiders.liaoning import LiaoningDataSpider
 
 
 def run_spider():
     process = CrawlerProcess(get_project_settings())
-    process.crawl(DataGovSpider)
+    process.crawl(LiaoningDataSpider)
     process.start()
 
 
