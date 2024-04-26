@@ -13,7 +13,7 @@ SPIDER_MODULES = ["CNDataAudit.spiders"]
 NEWSPIDER_MODULE = "CNDataAudit.spiders"
 
 # custom
-# CLOSESPIDER_PAGECOUNT = 50
+CLOSESPIDER_PAGECOUNT = 5
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "CNDataAudit (+http://www.yourdomain.com)"

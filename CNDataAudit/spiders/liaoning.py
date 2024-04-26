@@ -12,7 +12,7 @@ dataset_page_xpath = ('//*[contains(concat( " ", @class, " " ), '
 def get_start_urls():
     template = ('https://data.ln.gov.cn/oportal/catalog/'
                 'index?fileFormat=4&openType=1&page={}')
-    return [template.format(i) for i in range(1, 10)]
+    return [template.format(i) for i in range(1, 2)]
 
 
 class LiaoningDataSpider(CrawlSpider):
@@ -24,7 +24,7 @@ class LiaoningDataSpider(CrawlSpider):
     )
     download_url_template = ('https://data.ln.gov.cn/oportal/catalog/'
                              'download?cataId={}&cataName={}&idInRc={}')
-    base_download_url = 'https://data.ln.gov.cn/oportal/catalog/'
+    base_download_url = 'https://data.ln.gov.cn/oportal/catalog/download'
 
     def parse_item(self, response):
         def extract_with_xpath(xpath):
@@ -38,7 +38,6 @@ class LiaoningDataSpider(CrawlSpider):
                                       cata_name=cata_name, id_in_rc=id_in_rc)
 
         download_url = construct_download_url()
-        # yield {'download_url': download_url.url}
         request = Request(download_url.url, callback=self.save_file)
         request.meta['cata_name'] = download_url.cata_name
         yield request
@@ -61,8 +60,3 @@ class DatasetDownloadURL:
         """Constructs and returns the full URL based on current parameters."""
         return (f'{self.base_url}?cataId={self.cata_id}&cataName={self.cata_name}'
                 f'&idInRc={self.id_in_rc}')
-
-    @property
-    def name(self):
-        """Returns the catalog name."""
-        return self.cata_name
