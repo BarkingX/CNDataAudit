@@ -1,9 +1,41 @@
+from enum import Enum
 from pathlib import Path
 from dataclasses import dataclass
 
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from scrapy.http import Request
+
+
+class FileFormat(Enum):
+    ALL = 'all'
+    XLS = '1'
+    XML = '2'
+    JSON = '3'
+    CSV = '4'
+    RDF = '5'
+    API = '6'
+    LINK = '7'
+    OTHER = '8'
+
+    def __str__(self):
+        return self.value
+
+    def extension_name(self):
+        return FileFormat.extension_map().get(self, 'txt')
+
+    @staticmethod
+    def extension_map():
+        return {f: f.name.lower() for f in FileFormat[1:6]}
+
+
+class DataOpenType(Enum):
+    ALL = 'all'
+    UNRESTRICTED = '1'
+    RESTRICTED = '2'
+
+    def __str__(self):
+        return self.value
 
 
 @dataclass
@@ -27,8 +59,8 @@ def extract_with_xpath(xpath, response):
 class GenericDataSpider(CrawlSpider):
     # Defaults
     num_pages = 20
-    file_format = 4
-    open_type = '1'
+    file_format = FileFormat.CSV
+    open_type = DataOpenType.UNRESTRICTED
 
     dataset_page_xpath = ('//*[contains(concat( " ", @class, " " ), '
                           'concat( " ", "cata-title", " " ))]/a[1]')
@@ -55,12 +87,12 @@ class GenericDataSpider(CrawlSpider):
                 f'page={page_number}')
 
     def parse_dataset_page(self, response):
-        download_url = self.construct_download_url(response)
-        print(download_url.url)
-        yield Request(download_url.url, callback=self.save_file,
+        download_url = self.extract_download_url(response)
+        yield Request(download_url.url,
+                      callback=self.save_file,
                       meta={'cata_name': download_url.cata_name})
 
-    def construct_download_url(self, response):
+    def extract_download_url(self, response):
         cata_id = extract_with_xpath('//input[@id="cata_id"]/@value', response)
         cata_name = extract_with_xpath('//input[@id="cata_name"]/@value', response)
         id_in_rc = extract_with_xpath('//tr[@fileformat="csv"]/td/a/@id', response)
@@ -69,12 +101,12 @@ class GenericDataSpider(CrawlSpider):
                                   cata_id=cata_id, cata_name=cata_name, id_in_rc=id_in_rc)
 
     def save_file(self, response):
-        filename = response.meta.get('cata_name')
         directory_path = Path(self.name)
 
         if not directory_path.exists():
             directory_path.mkdir(parents=True, exist_ok=True)
 
-        file_path = directory_path / f'{filename}.csv'
+        filename = response.meta.get('cata_name')
+        file_path = directory_path / f'{filename}.{self.file_format.extension_name()}'
         file_path.write_bytes(response.body)
         self.log(f'Saved file {filename}')
