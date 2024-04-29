@@ -26,7 +26,9 @@ class FileFormat(Enum):
 
     @staticmethod
     def extension_map():
-        return {f: f.name.lower() for f in FileFormat[1:6]}
+        valid_formats = {FileFormat.XLS, FileFormat.XML, FileFormat.JSON, FileFormat.CSV,
+                         FileFormat.RDF}
+        return {f: f.name.lower() for f in FileFormat if f in valid_formats}
 
 
 class DataOpenType(Enum):
@@ -52,7 +54,7 @@ class DatasetDownloadURL:
                 f'&idInRc={self.id_in_rc}')
 
 
-def extract_with_xpath(xpath, response):
+def extract_with_xpath(response, xpath):
     return response.xpath(xpath).extract_first().strip()
 
 
@@ -93,12 +95,15 @@ class GenericDataSpider(CrawlSpider):
                       meta={'cata_name': download_url.cata_name})
 
     def extract_download_url(self, response):
-        cata_id = extract_with_xpath('//input[@id="cata_id"]/@value', response)
-        cata_name = extract_with_xpath('//input[@id="cata_name"]/@value', response)
-        id_in_rc = extract_with_xpath('//tr[@fileformat="csv"]/td/a/@id', response)
+        cata_id_xpath = '//input[@id="cata_id"]/@value'
+        cata_name_xpath = '//input[@id="cata_name"]/@value'
+        id_in_rc_xpath = (f'//tr[@fileformat="{self.file_format.extension_name()}"]/td'
+                          '//*[contains(@class, "downloadFileLink")]/@id')
 
         return DatasetDownloadURL(base_url=f'{self.base_catalog_url}download',
-                                  cata_id=cata_id, cata_name=cata_name, id_in_rc=id_in_rc)
+                                  cata_id=extract_with_xpath(response, cata_id_xpath),
+                                  cata_name=extract_with_xpath(response, cata_name_xpath),
+                                  id_in_rc=extract_with_xpath(response, id_in_rc_xpath))
 
     def save_file(self, response):
         directory_path = Path(self.name)
