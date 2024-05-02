@@ -1,7 +1,7 @@
-from CNDataAudit.spiders import GenericDataSpider
+from CNDataAudit.spiders import SpecificProvinceDataSpider
 
 
-class LiaoningDataSpider(GenericDataSpider):
+class LiaoningDataSpider(SpecificProvinceDataSpider):
     num_pages = 20
     name = 'liaoning'
     domain = 'data.ln.gov.cn'

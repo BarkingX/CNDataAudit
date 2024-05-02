@@ -1,7 +1,7 @@
-from CNDataAudit.spiders import GenericDataSpider
+from CNDataAudit.spiders import SpecificProvinceDataSpider
 
 
-class ShandongDataSpider(GenericDataSpider):
+class ShandongDataSpider(SpecificProvinceDataSpider):
     # The DOM of page for dataset is updating dynamically using javascript
     # Unable to scrape easily......
     num_pages = 1

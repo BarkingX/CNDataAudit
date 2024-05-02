@@ -3,4 +3,4 @@
 # Please refer to the documentation for information on how to create and manage
 # your spiders.
 
-from CNDataAudit.spiders.generic_data_spider import GenericDataSpider
+from CNDataAudit.spiders.specific_province_data_spider import SpecificProvinceDataSpider

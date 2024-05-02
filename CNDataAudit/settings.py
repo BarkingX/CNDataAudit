@@ -12,9 +12,6 @@ BOT_NAME = "CNDataAudit"
 SPIDER_MODULES = ["CNDataAudit.spiders"]
 NEWSPIDER_MODULE = "CNDataAudit.spiders"
 
-# custom
-# CLOSESPIDER_PAGECOUNT = 20
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "CNDataAudit (+http://www.yourdomain.com)"
 
